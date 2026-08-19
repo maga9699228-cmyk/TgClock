@@ -11,6 +11,34 @@ from telethon import functions, types
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import config
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+def run_web_server():
+    server = HTTPServer(('0.0.0.0', 10000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+
+
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+def run_web_server():
+    server = HTTPServer(('0.0.0.0', 10000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+
 
 def time_to_string(dt: datetime) -> str:
     """
@@ -42,7 +70,8 @@ client = TelegramClient("Clock in name", config.API_ID, config.API_HASH)
 
 async def main():
     await client.start()
-    
+    threading.Thread(target=run_web_server, daemon=True).start()
+
     loop = asyncio.get_running_loop()
     sheduler = AsyncIOScheduler(event_loop=loop, timezone=pytz.timezone('Asia/Vladivostok'))
     sheduler.add_job(update_clock, 'cron', minute='*', args=[client])
