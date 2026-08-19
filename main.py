@@ -3,6 +3,7 @@
     and run function that updates username when minute is changed.
 """
 from datetime import datetime
+import pytz
 
 import asyncio
 from telethon.sync import TelegramClient
@@ -43,7 +44,7 @@ async def main():
     await client.start()
     
     loop = asyncio.get_running_loop()
-    sheduler = AsyncIOScheduler(event_loop=loop)
+    sheduler = AsyncIOScheduler(event_loop=loop, timezone=pytz.timezone('Asia/Vladivostok'))
     sheduler.add_job(update_clock, 'cron', minute='*', args=[client])
     sheduler.start()
     
